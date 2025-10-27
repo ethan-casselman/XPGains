@@ -19,7 +19,7 @@ const Home = () => {
             <Card.Title 
             title="Welcome to XPGains!"
             left={(props) => <Avatar.Icon {...props} icon="account"/>}
-            titleStyle={{fontWeight: '700', marginVertical: '5', fontSize: '20'}}
+            titleStyle={{fontWeight: '700', marginVertical: '10', fontSize: '20', color: "#000000ff",}}
             />
             <Card.Content>
               <Text style={styles.signInSubtitle}>
@@ -36,30 +36,25 @@ const Home = () => {
           </Card>
 
           <Card style={styles.featureCard}>
-            <Card.Title title="Embark On Your Workout Journey!" 
-            titleStyle={{fontWeight: '700', fontSize: '21', justifyContent: 'center',
-              marginVertical: '10',
-            }}
-            />
-            <Card.Content>
-              <Text style={styles.featureCardSubtitle}>
-                Start your workout journey in a fun and interactive way! Follow the path 
-                to uncover new workouts to add to your workout sessions.
+            <Card.Content style={styles.centeredCardContent}>
+              <Text style={styles.featureCardTitle}>
+              Embark On Your Workout Journey!
+              </Text>
+            <Text style={styles.featureCardSubtitle}>
+            Start your workout journey in a fun and interactive way! Follow the path 
+            to uncover new workouts to add to your workout sessions.
               </Text>
             </Card.Content>
           </Card>
 
           <Card style={styles.featureCard}>
-            <Card.Title title="Create Your Own Workout Adventure" 
-            titleStyle={{fontWeight: '700', fontSize: '19', justifyContent: 'center',
-              marginVertical: '10'
-            }}
-            />
-            <Card.Content>
-              <Text style={styles.featureCardSubtitle}>
-                Use your unlocked workouts to create your own workout programs. 
-                Saved presets allow you to plan out your session in advance and track
-                your progress.
+            <Card.Content style={styles.centeredCardContent}>
+              <Text style={styles.featureCardTitle}>
+              Create Your Own Workout Adventure!
+              </Text>
+            <Text style={styles.featureCardSubtitle}>
+            Use your unlocked workouts to create your own workout programs. Saved presets 
+            allow you to plan out your session in advance and track your progress.
               </Text>
             </Card.Content>
           </Card>
@@ -78,12 +73,12 @@ const styles = StyleSheet.create({
     },
 
     header: {
-      backgroundColor: '#000000ff',
+      backgroundColor: '#343434ff',
     },
 
     scrollArea: {
       flex: 1,
-      backgroundColor: '#3b3b3bff', 
+      backgroundColor: '#000000ff', 
     },
 
     body: {
@@ -99,13 +94,9 @@ const styles = StyleSheet.create({
       color: '#15ff00ff',
     },
 
-    body: {
-      padding: 16,
-      alignItems: 'center',
-    },
-
     signInCard: {
       width: '95%',
+      backgroundColor: '#ffffffff',
       marginVertical: 12,
     },
 
@@ -116,16 +107,37 @@ const styles = StyleSheet.create({
       lineHeight: 20,
       fontSize: 18,
       textAlign: 'center',
+      color: '#000000ff',
     },
 
     featureCard: {
       width: '95%',
-      marginVertical: 15,
+      marginVertical: 10,
+      borderRadius: 12,
+      backgroundColor: '#ffffffff',
+      overflow: 'hidden',
+      paddingVertical: 10,
+    },
+
+    centeredCardContent: {
+      alignItems: 'center', 
+      justifyContent: 'center',
+     textAlign: 'center',
+    },
+
+    featureCardTitle: {
+      fontWeight: '700',
+      fontSize: 21,
+      color: '#000000ff',
+      textAlign: 'center',
+      marginBottom: 10,
     },
 
     featureCardSubtitle: {
-      fontSize: 18,
+      fontSize: 16,
+      color: '#000000ff',
       textAlign: 'center',
+      lineHeight: 20,
     },
 
     center: {
