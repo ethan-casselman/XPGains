@@ -1,6 +1,7 @@
-import { StyleSheet, ScrollView, View, } from 'react-native'
+import { StyleSheet, ScrollView, View, Image } from 'react-native'
 import React from 'react'
 import {Provider as PaperProvider, Button, Appbar, Card, Text, Avatar} from 'react-native-paper';
+import pushup from '../assets/img/pushup.gif';
 
 const Home = () => {
   const handleMenu = () => alert('Menu Pressed');
@@ -56,6 +57,19 @@ const Home = () => {
             Use your unlocked workouts to create your own workout programs. Saved presets 
             allow you to plan out your session in advance and track your progress.
               </Text>
+            </Card.Content>
+          </Card>
+
+          <Card style={styles.featureCard}>
+            <Card.Content style={styles.centeredCardContent}>
+              <Text style={styles.featureCardTitle}>
+              Level Up Your Gains!
+              </Text>
+              <Image
+                source={pushup}
+                style={styles.gif}
+                resizeMode="contain"
+              />
             </Card.Content>
           </Card>
         
@@ -138,6 +152,12 @@ const styles = StyleSheet.create({
       color: '#000000ff',
       textAlign: 'center',
       lineHeight: 20,
+    },
+
+    gif: {
+      width: '100%',
+      height: 180,
+      borderRadius: 10,
     },
 
     center: {
