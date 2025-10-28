@@ -1,8 +1,7 @@
-import { StyleSheet, View } from 'react-native'
-import React from 'react'
-import React, {useState} from 'react';
+import React, { useState } from 'react';
+import { View, StyleSheet } from 'react-native';
 import { TextInput, Button, Text, Card } from 'react-native-paper';
-import {router} from 'expo-router'
+import { router } from 'expo-router';
 
 const signIn = () => {
 
@@ -25,7 +24,45 @@ const signIn = () => {
 
   return(
     <View style={styles.container}>
+        <Card style={styles.card}>
+            <Card.Content>
+                <Text style={styles.title}>
+                    {isCreatingAccount ? 'Create Your Account' : 'Welcome Back!'}
+                </Text>
 
+                <TextInput
+                    label = "Email"
+                    value = {email}
+                    onChangeText = {setEmail}
+                    autoCapitalize = 'none'
+                    keyboardType = 'email-address'
+                    style = {styles.input}
+                />
+
+                <TextInput
+                    label = "Password"
+                    value = {password}
+                    onChangeText = {setPassword}
+                    secureTextEntry
+                    style = {styles.input}
+                />
+
+                <Button mode = "contained" onPress = {handleSubmit} style = {styles.button}>
+                    {isCreatingAccount ? 'Create Account' : 'Sign In'}
+                </Button>
+
+                <Button
+                    onPress={() => setIsCreatingAccount(!isCreatingAccount)}
+                    style = {styles.switchButton}
+                >
+                    {isCreatingAccount ? 'Already have an Account? Sign In!' : "Need an account? Create One!"}
+                </Button>
+
+                <Button onPress={() => router.back()} style = {styles.backButton}>
+                Back Home
+                </Button>
+            </Card.Content>
+        </Card>
     </View>
   );
 }
