@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
-import { TextInput, Button, Text, Card } from 'react-native-paper';
+import { TextInput, Button, Text, Card, PaperProvider, Appbar } from 'react-native-paper';
 import { router } from 'expo-router';
 
 const signIn = () => {
@@ -9,6 +9,7 @@ const signIn = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
+    //Stuff for the future
     const handleSubmit = () => {
     if (isCreatingAccount) {
       console.log('Creating account with:', email, password);
@@ -21,7 +22,6 @@ const signIn = () => {
     router.push('/');
   };
   
-
   return(
     <View style={styles.container}>
         <Card style={styles.card}>
@@ -70,6 +70,9 @@ const signIn = () => {
 export default signIn
 
 const styles = StyleSheet.create({
+   header: {
+    backgroundColor: '#343434ff',
+    },
    container: {
     flex: 1,
     backgroundColor: '#000',
