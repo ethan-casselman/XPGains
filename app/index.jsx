@@ -2,6 +2,7 @@ import { StyleSheet, ScrollView, View, Image } from 'react-native'
 import React from 'react'
 import {Provider as PaperProvider, Button, Appbar, Card, Text, Avatar} from 'react-native-paper';
 import pushup from '../assets/img/pushup.gif';
+import {router} from 'expo-router';
 
 const Home = () => {
   const handleMenu = () => alert('Menu Pressed');
@@ -12,7 +13,7 @@ const Home = () => {
         <Appbar.Header style={styles.header}>
           <Appbar.Action icon="menu" color="#ffffff" onPress={handleMenu}/>
           <Appbar.Content title="XPGains" titleStyle={styles.title}/>
-          <Appbar.Action icon="account-circle" color="#ffffff" onPress={handlesSignIn} />
+          <Appbar.Action icon="account-circle" color="#ffffff" onPress={() => router.push('/signIn')} />
         </Appbar.Header>
 
         <ScrollView style={styles.scrollArea} contentContainerStyle={styles.body}>
@@ -29,7 +30,7 @@ const Home = () => {
               </Text>
             </Card.Content>
             <Card.Actions style={styles.center}>
-              <Button mode="contained" onPress={handlesSignIn}
+              <Button mode="contained" onPress={() => router.push('/signIn')}
               >
                 Sign In / Create Account
               </Button>
@@ -136,7 +137,7 @@ const styles = StyleSheet.create({
     centeredCardContent: {
       alignItems: 'center', 
       justifyContent: 'center',
-     textAlign: 'center',
+      textAlign: 'center',
     },
 
     featureCardTitle: {
