@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
-import { TextInput, Button, Text, Card, } from 'react-native-paper';
+import { TextInput, Button, Text, Card, PaperProvider, Appbar } from 'react-native-paper';
 import { router } from 'expo-router';
 
 const signIn = () => {
@@ -70,6 +70,9 @@ const signIn = () => {
 export default signIn
 
 const styles = StyleSheet.create({
+   header: {
+    backgroundColor: '#343434ff',
+    },
    container: {
     flex: 1,
     backgroundColor: '#000',
