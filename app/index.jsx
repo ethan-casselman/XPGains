@@ -1,20 +1,42 @@
 import { StyleSheet, ScrollView, View, Image } from 'react-native'
 import React from 'react'
-import {Provider as PaperProvider, Button, Appbar, Card, Text, Avatar} from 'react-native-paper';
+import { useState } from 'react';
+import {Provider as PaperProvider, Button, Appbar, Card, Text, Avatar, Modal, Portal} from 'react-native-paper';
 import pushup from '../assets/img/pushup.gif';
 import {router} from 'expo-router';
 
 const index = () => {
-  const handleMenu = () => alert('Menu Pressed');
+
+  const [menuVisible, setMenuVisible] = useState(false);
+  const openMenu = () => setMenuVisible(true);
+  const closeMenu = () => setMenuVisible(false);
 
   return (
     <PaperProvider>
       <View style={styles.container}>
         <Appbar.Header style={styles.header}>
-          <Appbar.Action icon="menu" color="#ffffff" onPress={handleMenu}/>
+          <Appbar.Action icon="menu" color="#ffffff" onPress={openMenu}/>
           <Appbar.Content title="XPGains" titleStyle={styles.title}/>
           <Appbar.Action icon="account-circle" color="#ffffff" onPress={() => router.push('/signIn')} />
         </Appbar.Header>
+
+        <Portal>
+          <Modal visible={menuVisible} onDismiss={closeMenu} contentContainerStyle={styles.menuContainer}>
+            <Text style={styles.menuTitle}>Menu</Text>
+
+            <Button mode="text" onPress={() => { closeMenu(); router.push('/'); }}>
+              Home
+            </Button>
+
+            <Button mode="text" onPress={() => { closeMenu(); router.push('/signIn'); }}>
+              Sign In / Create Account
+            </Button>
+
+            <Button mode="text" onPress={closeMenu}>
+              Close Menu
+            </Button>
+          </Modal>
+        </Portal>
 
         <ScrollView style={styles.scrollArea} contentContainerStyle={styles.body}>
           <Card style ={styles.signInCard}>
@@ -163,6 +185,25 @@ const styles = StyleSheet.create({
 
     center: {
       justifyContent: 'center',
+    },
+
+    menuContainer: {
+      backgroundColor: '#fff',
+      padding: 20,
+      width: '50%',
+      alignSelf: 'center',
+      borderRadius: 12,
+      shadowColor: '#000',
+      shadowOpacity: 0.2,
+      shadowRadius: 8,
+      elevation: 5,
+    },
+    menuTitle: {
+      fontSize: 20,
+      fontWeight: '700',
+      marginBottom: 10,
+      textAlign: 'center',
+      color: '#000000ff',
     },
     
 });
