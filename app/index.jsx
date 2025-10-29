@@ -2,7 +2,7 @@ import { StyleSheet, ScrollView, View, Image } from 'react-native'
 import React from 'react'
 import { useState } from 'react';
 import {Provider as PaperProvider, Button, Appbar, Card, Text, Avatar, Modal, Portal} from 'react-native-paper';
-import pushup from '../assets/img/pushup.gif';
+import xpGains from '../assets/img/XPGains_mascot.png';
 import {router} from 'expo-router';
 
 const index = () => {
@@ -24,15 +24,15 @@ const index = () => {
           <Modal visible={menuVisible} onDismiss={closeMenu} contentContainerStyle={styles.menuContainer}>
             <Text style={styles.menuTitle}>Menu</Text>
 
-            <Button mode="text" onPress={() => { closeMenu(); router.push('/'); }}>
+            <Button textColor = "#000000ff" mode="text" onPress={() => { closeMenu(); router.push('/'); }}>
               Home
             </Button>
 
-            <Button mode="text" onPress={() => { closeMenu(); router.push('/signIn'); }}>
+            <Button textColor = "#000000ff" mode="text" onPress={() => { closeMenu(); router.push('/signIn'); }}>
               Sign In / Create Account
             </Button>
 
-            <Button mode="text" onPress={closeMenu}>
+            <Button textColor = "#000000ff" mode="text" onPress={closeMenu}>
               Close Menu
             </Button>
           </Modal>
@@ -89,7 +89,7 @@ const index = () => {
               Level Up Your Gains!
               </Text>
               <Image
-                source={pushup}
+                source={xpGains}
                 style={styles.gif}
                 resizeMode="contain"
               />
