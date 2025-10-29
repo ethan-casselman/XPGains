@@ -40,5 +40,6 @@ yarn-error.*
 /ios
 /android
 
-# environment variables
-.env
+# environment variables (ignore .env files in all folders)
+**/.env
+**/.env.*
