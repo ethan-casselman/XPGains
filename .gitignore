@@ -41,5 +41,4 @@ yarn-error.*
 /android
 
 # environment variables (ignore .env files in all folders)
-**/.env
-**/.env.*
+server/.env
