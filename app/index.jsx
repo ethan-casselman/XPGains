@@ -190,7 +190,7 @@ const styles = StyleSheet.create({
     menuContainer: {
       backgroundColor: '#fff',
       padding: 20,
-      width: '50%',
+      width: '70%',
       alignSelf: 'center',
       borderRadius: 12,
       shadowColor: '#000',
