@@ -4,9 +4,9 @@ import {Provider as PaperProvider, Button, Appbar, Card, Text, Avatar} from 'rea
 import pushup from '../assets/img/pushup.gif';
 import {router} from 'expo-router';
 
-const Home = () => {
+const index = () => {
   const handleMenu = () => alert('Menu Pressed');
-  const handlesSignIn = () => alert('Sign In Pressed');
+
   return (
     <PaperProvider>
       <View style={styles.container}>
@@ -80,7 +80,7 @@ const Home = () => {
   );
 };
 
-export default Home
+export default index
 
 const styles = StyleSheet.create({
     container: {
