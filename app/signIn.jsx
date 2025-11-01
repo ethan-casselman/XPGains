@@ -32,7 +32,7 @@ const signIn = () => {
           // Otherwise, call the login API helper to verify credentials.
           await login({ email, password });
         }
-        router.replace('/'); // On success, navigate back to the home screen.
+        router.replace('/home'); // On success, navigate to the home screen.
       } catch (e) {
         setError(e?.message || 'Something went wrong'); // Show a friendly error if the request fails.
       } finally {
@@ -78,7 +78,7 @@ const signIn = () => {
                     {isCreatingAccount ? 'Already have an Account? Sign In!' : "Need an account? Create One!"}
                 </Button>
 
-                <Button onPress={() => router.back()} style = {styles.backButton}>
+                <Button onPress={() => router.replace('/')} style = {styles.backButton}>
                 Back Home
                 </Button>
             </Card.Content>
