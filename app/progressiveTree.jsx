@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { Text, Appbar, ActivityIndicator, PaperProvider } from 'react-native-paper';
-import Svg, { Line } from 'react-native-svg';
+import { Text, Appbar, PaperProvider, ActivityIndicator } from 'react-native-paper';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
-import { getProgress, completeWorkout } from './lib/api';
+import { getProgress, getWorkoutTree, completeWorkout } from './lib/api';
 
 export default function ProgressiveTree() {
   const [loading, setLoading] = useState(true);
@@ -13,74 +13,101 @@ export default function ProgressiveTree() {
   useEffect(() => {
     async function fetchData() {
       try {
-        // Mock workouts
-        const mockWorkouts = [
-          { id: 'warmup1', name: 'Warm-Up 1', levelRequired: 1, prerequisites: [] },
-          { id: 'pushups', name: 'Push-Ups', levelRequired: 1, prerequisites: ['warmup1'] },
-          { id: 'squats', name: 'Squats', levelRequired: 2, prerequisites: ['pushups'] },
-          { id: 'plank', name: 'Plank', levelRequired: 2, prerequisites: ['pushups'] },
-          { id: 'burpees', name: 'Burpees', levelRequired: 3, prerequisites: ['squats', 'plank'] },
-        ];
-        setWorkouts(mockWorkouts);
+        const email = await AsyncStorage.getItem('userEmail');
+        if (!email) return;
 
-        // Temporary mock progress
-        const mockProgress = {
-          level: 2,
-          completedWorkouts: ['warmup1', 'pushups'],
-        };
-        setProgress(mockProgress);
+        const [progressData, workoutData] = await Promise.all([
+          getProgress(email),
+          getWorkoutTree(),
+        ]);
+
+        setProgress(progressData);
+        setWorkouts(workoutData);
       } catch (err) {
-        console.error(err);
+        console.error('Error loading tree:', err.message);
       } finally {
         setLoading(false);
       }
     }
+
     fetchData();
   }, []);
+
+  const isUnlocked = (workout) => {
+  // If no prerequisites, it’s always unlocked
+  if (!workout.prerequisites || workout.prerequisites.length === 0) return true;
+
+  // Otherwise, check if all prerequisites are completed
+  return workout.prerequisites.every((req) =>
+    progress?.completedWorkouts?.includes(req)
+  );
+};
+
+const getBubbleColor = (workout) => {
+  if (progress?.completedWorkouts?.includes(workout.id)) return '#15ff00ff'; // completed
+  if (isUnlocked(workout)) return '#ffff00ff'; // unlocked by prereqs
+  return '#555'; // locked
+};
+
+
+  const handleWorkoutPress = async (workout) => {
+    try {
+      const email = await AsyncStorage.getItem('userEmail');
+      const updated = await completeWorkout(email, workout.id);
+      setProgress(updated);
+      alert(`${workout.name} completed!`);
+    } catch (err) {
+      alert('Error completing workout: ' + err.message);
+    }
+  };
 
   if (loading) {
     return (
       <PaperProvider>
         <View style={styles.center}>
           <ActivityIndicator size="large" />
-          <Text>Loading your workout tree...</Text>
+          <Text style={{ marginTop: 10 }}>Loading your workout tree...</Text>
         </View>
       </PaperProvider>
     );
   }
 
-  const getBubbleColor = (workout) => {
-    if (progress.completedWorkouts.includes(workout.id)) return '#15ff00ff'; // completed = green
-    if (workout.levelRequired <= progress.level) return '#ffff00ff'; // unlocked = yellow
-    return '#555'; // locked = grey
-  };
-
   return (
     <PaperProvider>
-  <View style={styles.container}>
-    <Appbar.Header style={styles.header}>
-      <Appbar.BackAction onPress={() => router.back()} />
-      <Appbar.Content title="Progressive Workout Tree" titleStyle={styles.title} />
-    </Appbar.Header>
+      <View style={styles.container}>
+        <Appbar.Header style={styles.header}>
+          <Appbar.BackAction onPress={() => router.back()} />
+          <Appbar.Content title="Progressive Workout Tree" titleStyle={styles.title} />
+        </Appbar.Header>
 
-    <ScrollView 
-      contentContainerStyle={styles.treeContainer} 
-      showsVerticalScrollIndicator={false}
-    >
-      {workouts.map((workout) => (
-        <TouchableOpacity
-          key={workout.id}
-          style={[styles.bubble, { backgroundColor: getBubbleColor(workout) }]}
-          disabled={workout.levelRequired > progress.level}
-          onPress={() => alert(`${workout.name} tapped!`)}
+        <ScrollView
+          contentContainerStyle={styles.treeContainer}
+          showsVerticalScrollIndicator={false}
         >
-          <Text style={styles.bubbleText}>{workout.name}</Text>
-        </TouchableOpacity>
-      ))}
-    </ScrollView>
-  </View>
-</PaperProvider>
+          {/* User Level Display */}
+          <Text style={styles.levelText}>
+            Level: {progress?.level ?? 1}
+          </Text>
 
+          {workouts.length === 0 ? (
+            <Text style={{ color: '#fff', marginTop: 40 }}>No workouts found in database.</Text>
+          ) : (
+            workouts.map((workout) => (
+              <TouchableOpacity
+                key={workout.id}
+                style={[styles.bubble, { backgroundColor: getBubbleColor(workout) }]}
+                disabled={
+                !isUnlocked(workout) ||
+                progress?.completedWorkouts?.includes(workout.id)
+                }
+                onPress={() => handleWorkoutPress(workout)}>
+                <Text style={styles.bubbleText}>{workout.name}</Text>
+              </TouchableOpacity>
+            ))
+          )}
+        </ScrollView>
+      </View>
+    </PaperProvider>
   );
 }
 
@@ -99,16 +126,27 @@ const styles = StyleSheet.create({
   },
   treeContainer: {
     alignItems: 'center',
-    paddingTop: 10,
+    paddingTop: 20,
     paddingBottom: 80,
     backgroundColor: '#000',
   },
+  center: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  levelText: {
+    color: '#15ff00ff',
+    fontSize: 20,
+    fontWeight: '700',
+    marginBottom: 20,
+  },
   bubble: {
-    paddingVertical: 18,
-    paddingHorizontal: 24,
+    paddingVertical: 20,
+    paddingHorizontal: 28,
     borderRadius: 50,
-    marginVertical: 10,
-    width: 200,
+    marginVertical: 12,
+    width: 220,
     alignItems: 'center',
   },
   bubbleText: {
@@ -117,5 +155,3 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
 });
-
-

@@ -29,6 +29,26 @@ export function login({ email, password }) {
 }
 
 // -----------------------------
+// Progress and Workout Tree API
+// -----------------------------
+
+export function getProgress(email) {
+  return request(`/progress/${email}`, { method: 'GET' });
+}
+
+export function getWorkoutTree() {
+  return request('/progress/tree/all', { method: 'GET' });
+}
+
+export function completeWorkout(email, workoutId) {
+  return request('/progress/complete', {
+    method: 'POST',
+    body: { email, workoutId },
+  });
+}
+
+
+// -----------------------------
 // How to expand this API client next
 // -----------------------------
 // 1) Read the base URL from app.json (expo-constants) instead of hardcoding.

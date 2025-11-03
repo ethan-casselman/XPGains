@@ -40,7 +40,7 @@ router.post('/complete', async (req, res) => {
     if (!user.completedWorkouts.includes(workoutId)) {
       user.completedWorkouts.push(workoutId);
       // Simple rule: +1 level per 3 workouts
-      user.level = Math.floor(user.completedWorkouts.length / 3) + 1;
+      user.level = Math.floor(user.completedWorkouts.length / 2) + 1;
       await user.save();
     }
 

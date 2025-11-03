@@ -4,6 +4,9 @@ import { useState } from 'react';
 import {Provider as PaperProvider, Button, Appbar, Card, Text, Dialog, Modal, Portal} from 'react-native-paper';
 import xpGains from '../assets/img/XPGains_mascot.png';
 import {router} from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useEffect } from 'react';
+import { getProgress } from './lib/api';
 
 export default function Home() {
 
@@ -19,6 +22,22 @@ export default function Home() {
     closeSignOutDialog();
     router.replace('/'); 
 };
+
+const [userProgress, setUserProgress] = useState(null);
+
+useEffect(() => {
+  async function fetchProgress() {
+    const email = await AsyncStorage.getItem('userEmail');
+    if (!email) return;
+    try {
+      const progress = await getProgress(email);
+      setUserProgress(progress);
+    } catch (err) {
+      console.error('Failed to fetch progress:', err.message);
+    }
+  }
+  fetchProgress();
+}, []);
 
   return (
     <PaperProvider>
@@ -60,8 +79,11 @@ export default function Home() {
             </Dialog>
         </Portal>
 
-
         <View style={styles.body}>
+          <Text style={{ color: '#15ff00ff', fontSize: 18, marginBottom: 12 }}>
+            Level: {userProgress?.level ?? 1}
+          </Text>
+
           <Card style={styles.featureCard}>
             <Card.Content>
               <Text style={styles.cardTitle}>Progressive Workout Tree</Text>
