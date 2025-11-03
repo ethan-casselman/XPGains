@@ -3,10 +3,12 @@ import express from 'express';  // Pulls in the Express web framework to build o
 import mongoose from 'mongoose';    // Mongoose is an ODM that lets us talk to MongoDB using models and schemas.
 import cors from 'cors';    // CORS middleware so our Expo app (running on a different origin) can call this API in dev.
 import { User } from './models/User.js';    // Our Mongoose User model (email + password) stored in MongoDB.
+import progressRoutes from './routes/progress.js';
 
 const app = express();  // Creates the Express application (the server instance).
 app.use(cors());    // Enables Cross-Origin Resource Sharing for all routes (fine for local learning).
 app.use(express.json());    // Lets Express automatically parse JSON request bodies into req.body.
+app.use('/api/progress', progressRoutes);
 
 // Health check
 app.get('/health', (_req, res) => res.json({ ok: true }));  // A tiny endpoint you can hit to verify the API is running.
