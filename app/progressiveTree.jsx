@@ -129,11 +129,17 @@ export default function ProgressiveTree() {
 
           {/* Level 4 – Conditioning */}
           <View style={styles.multiRow}>
-            {getWorkoutById("lunges") && renderBubble(getWorkoutById("lunges"))}
+          {/* Top row: Jumping Jacks + Sit-Ups */}
             {getWorkoutById("jumpingjacks") && renderBubble(getWorkoutById("jumpingjacks"))}
             {getWorkoutById("situps") && renderBubble(getWorkoutById("situps"))}
-            {getWorkoutById("mountainclimbers") && renderBubble(getWorkoutById("mountainclimbers"))}
           </View>
+
+<View style={styles.multiRow}>
+  {/* Bottom row: Mountain Climbers + Lunges */}
+  {getWorkoutById("mountainclimbers") && renderBubble(getWorkoutById("mountainclimbers"))}
+  {getWorkoutById("lunges") && renderBubble(getWorkoutById("lunges"))}
+</View>
+
 
           {/* Level 5 – Challenge */}
           <View style={styles.doubleRow}>
@@ -172,20 +178,20 @@ const styles = StyleSheet.create({
   singleRow: {
     flexDirection: "row",
     justifyContent: "center",
-    marginVertical: 40,
+    marginVertical: 25,
   },
   doubleRow: {
     flexDirection: "row",
     justifyContent: "space-around",
     width: "100%",
-    marginVertical: 40,
+    marginVertical: 50,
   },
   multiRow: {
     flexDirection: "row",
     justifyContent: "space-around",
     width: "100%",
     flexWrap: "wrap",
-    marginVertical: 40,
+    marginVertical: 5,
   },
   bubble: {
     width: bubbleSize,
