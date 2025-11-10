@@ -1,4 +1,4 @@
-const API_URL = 'http://192.168.0.14:4000/api';
+const API_URL = 'http://192.168.0.185:4000/api';
 // Base URL of our Express server. On a real device, replace localhost with your PC's LAN IP
 // (e.g., http://192.168.1.50:4000/api) so the phone can reach the server.
 

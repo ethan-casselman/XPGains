@@ -23,7 +23,7 @@ router.get('/:email', async (req, res) => {
 // Get all workouts (for the tree)
 router.get('/tree/all', async (_req, res) => {
   try {
-    const workouts = await Workout.find();
+    const workouts = await Workout.find().sort({levelRequired: 1, order: 1});
     res.json(workouts);
   } catch (err) {
     console.error(err);
@@ -39,7 +39,7 @@ router.post('/complete', async (req, res) => {
 
     if (!user.completedWorkouts.includes(workoutId)) {
       user.completedWorkouts.push(workoutId);
-      // Simple rule: +1 level per 3 workouts
+      // How levels are handled
       user.level = Math.floor(user.completedWorkouts.length / 2) + 1;
       await user.save();
     }
