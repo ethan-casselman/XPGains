@@ -14,24 +14,7 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import { getProgress, getWorkoutTree, completeWorkout } from "./lib/api";
-import React, { useEffect, useState } from "react";
-import {
-  View,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-} from "react-native";
-import {
-  Text,
-  Appbar,
-  PaperProvider,
-  ActivityIndicator,
-} from "react-native-paper";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { router } from "expo-router";
-import { getProgress, getWorkoutTree, completeWorkout } from "./lib/api";
 
-const bubbleSize = 110;
 const bubbleSize = 110;
 
 export default function ProgressiveTree() {
@@ -41,9 +24,7 @@ export default function ProgressiveTree() {
 
   useEffect(() => {
     (async () => {
-    (async () => {
       try {
-        const email = await AsyncStorage.getItem("userEmail");
         const email = await AsyncStorage.getItem("userEmail");
         if (!email) return;
         const [progressData, workoutData] = await Promise.all([
@@ -54,20 +35,12 @@ export default function ProgressiveTree() {
         setWorkouts(workoutData);
       } catch (err) {
         console.error("Error loading tree:", err.message);
-        console.error("Error loading tree:", err.message);
       } finally {
         setLoading(false);
       }
     })();
-    })();
   }, []);
 
-  const isUnlocked = (w) => {
-    const lvl = progress?.level ?? 1;
-    if (lvl < (w.levelRequired ?? 1)) return false;
-    if (!w.prerequisites || !w.prerequisites.length) return true;
-    return w.prerequisites.every((r) =>
-      progress?.completedWorkouts?.includes(r)
   const isUnlocked = (w) => {
     const lvl = progress?.level ?? 1;
     if (lvl < (w.levelRequired ?? 1)) return false;
@@ -81,24 +54,15 @@ export default function ProgressiveTree() {
     if (progress?.completedWorkouts?.includes(w.id)) return "#15ff00ff"; // completed
     if (isUnlocked(w)) return "#ffff00ff"; // unlocked
     return "#555"; // locked
-  const getColor = (w) => {
-    if (progress?.completedWorkouts?.includes(w.id)) return "#15ff00ff"; // completed
-    if (isUnlocked(w)) return "#ffff00ff"; // unlocked
-    return "#555"; // locked
   };
 
-  const handleWorkoutPress = async (w) => {
   const handleWorkoutPress = async (w) => {
     try {
       const email = await AsyncStorage.getItem("userEmail");
       const updated = await completeWorkout(email, w.id);
-      const email = await AsyncStorage.getItem("userEmail");
-      const updated = await completeWorkout(email, w.id);
       setProgress(updated);
       alert(`${w.name} completed!`);
-      alert(`${w.name} completed!`);
     } catch (err) {
-      alert("Error completing workout: " + err.message);
       alert("Error completing workout: " + err.message);
     }
   };
@@ -135,13 +99,6 @@ export default function ProgressiveTree() {
         {/* Appbar with Level Display */}
         <Appbar.Header style={styles.header}>
           <Appbar.BackAction onPress={() => router.back()} />
-          <Appbar.Content
-            title="Progressive Workout Tree"
-            titleStyle={styles.title}
-          />
-          <View style={styles.levelBadge}>
-            <Text style={styles.levelText}>Lvl {progress?.level ?? 1}</Text>
-          </View>
           <Appbar.Content
             title="Progressive Workout Tree"
             titleStyle={styles.title}
@@ -200,16 +157,6 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     marginRight: 10,
   },
-  container: { flex: 1, backgroundColor: "#000" },
-  header: { backgroundColor: "#343434ff" },
-  title: { color: "#15ff00ff", fontWeight: "bold", fontSize: 22 },
-  levelBadge: {
-    backgroundColor: "#15ff00ff",
-    borderRadius: 20,
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    marginRight: 10,
-  },
   levelText: {
     color: "#000",
     fontWeight: "bold",
@@ -247,14 +194,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginHorizontal: 10,
-    justifyContent: "center",
-    alignItems: "center",
-    marginHorizontal: 10,
   },
-  bubbleText: {
-    color: "#000",
-    fontWeight: "700",
-    textAlign: "center",
   bubbleText: {
     color: "#000",
     fontWeight: "700",
