@@ -67,6 +67,21 @@ export default function ProgressiveTree() {
     }
   };
 
+  const getWorkoutById = (id) => workouts.find((w) => w.id === id);
+
+  const renderBubble = (w) => (
+    <TouchableOpacity
+      key={w.id}
+      style={[styles.bubble, { backgroundColor: getColor(w) }]}
+      disabled={
+        !isUnlocked(w) || progress?.completedWorkouts?.includes(w.id)
+      }
+      onPress={() => handleWorkoutPress(w)}
+    >
+      <Text style={styles.bubbleText}>{w.name}</Text>
+    </TouchableOpacity>
+  );
+
   if (loading) {
     return (
       <PaperProvider>
@@ -78,18 +93,10 @@ export default function ProgressiveTree() {
     );
   }
 
-  const getWorkout = (name) =>
-    workouts.find((w) => w.name.toLowerCase().includes(name.toLowerCase()));
-
-  const warmUp = getWorkout("warm");
-  const pushUps = getWorkout("push");
-  const squats = getWorkout("squat");
-  const planks = getWorkout("plank");
-  const burpees = getWorkout("burpee");
-
   return (
     <PaperProvider>
       <View style={styles.container}>
+        {/* Appbar with Level Display */}
         <Appbar.Header style={styles.header}>
           <Appbar.BackAction onPress={() => router.back()} />
           <Appbar.Content
@@ -102,79 +109,37 @@ export default function ProgressiveTree() {
         </Appbar.Header>
 
         <ScrollView contentContainerStyle={styles.treeContainer}>
-          {/* Level 1 - Warm Up */}
-          {warmUp && (
-            <TouchableOpacity
-              style={[styles.bubble, { backgroundColor: getColor(warmUp) }]}
-              disabled={
-                !isUnlocked(warmUp) ||
-                progress?.completedWorkouts?.includes(warmUp.id)
-              }
-              onPress={() => handleWorkoutPress(warmUp)}
-            >
-              <Text style={styles.bubbleText}>{warmUp.name}</Text>
-            </TouchableOpacity>
-          )}
-
-          {/* Level 2 - Push-Ups */}
-          {pushUps && (
-            <View style={styles.singleRow}>
-              <TouchableOpacity
-                style={[styles.bubble, { backgroundColor: getColor(pushUps) }]}
-                disabled={
-                  !isUnlocked(pushUps) ||
-                  progress?.completedWorkouts?.includes(pushUps.id)
-                }
-                onPress={() => handleWorkoutPress(pushUps)}
-              >
-                <Text style={styles.bubbleText}>{pushUps.name}</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-
-          {/* Level 3 - Squats and Planks */}
-          <View style={styles.doubleRow}>
-            {squats && (
-              <TouchableOpacity
-                style={[styles.bubble, { backgroundColor: getColor(squats) }]}
-                disabled={
-                  !isUnlocked(squats) ||
-                  progress?.completedWorkouts?.includes(squats.id)
-                }
-                onPress={() => handleWorkoutPress(squats)}
-              >
-                <Text style={styles.bubbleText}>{squats.name}</Text>
-              </TouchableOpacity>
-            )}
-            {planks && (
-              <TouchableOpacity
-                style={[styles.bubble, { backgroundColor: getColor(planks) }]}
-                disabled={
-                  !isUnlocked(planks) ||
-                  progress?.completedWorkouts?.includes(planks.id)
-                }
-                onPress={() => handleWorkoutPress(planks)}
-              >
-                <Text style={styles.bubbleText}>{planks.name}</Text>
-              </TouchableOpacity>
-            )}
+          {/* Level 1 – Warm-Ups */}
+          <View style={styles.multiRow}>
+            {getWorkoutById("dynamicstretch") && renderBubble(getWorkoutById("dynamicstretch"))}
+            {getWorkoutById("armcircles") && renderBubble(getWorkoutById("armcircles"))}
+            {getWorkoutById("highknees") && renderBubble(getWorkoutById("highknees"))}
           </View>
 
-          {/* Level 4 - Burpees */}
-          {burpees && (
-            <View style={styles.singleRow}>
-              <TouchableOpacity
-                style={[styles.bubble, { backgroundColor: getColor(burpees) }]}
-                disabled={
-                  !isUnlocked(burpees) ||
-                  progress?.completedWorkouts?.includes(burpees.id)
-                }
-                onPress={() => handleWorkoutPress(burpees)}
-              >
-                <Text style={styles.bubbleText}>{burpees.name}</Text>
-              </TouchableOpacity>
-            </View>
-          )}
+          {/* Level 2 – Push-Ups */}
+          <View style={styles.singleRow}>
+            {getWorkoutById("pushups") && renderBubble(getWorkoutById("pushups"))}
+          </View>
+
+          {/* Level 3 – Squats and Planks */}
+          <View style={styles.doubleRow}>
+            {getWorkoutById("squats") && renderBubble(getWorkoutById("squats"))}
+            {getWorkoutById("planks") && renderBubble(getWorkoutById("planks"))}
+          </View>
+
+          {/* Level 4 – Conditioning */}
+          <View style={styles.multiRow}>
+            {getWorkoutById("lunges") && renderBubble(getWorkoutById("lunges"))}
+            {getWorkoutById("jumpingjacks") && renderBubble(getWorkoutById("jumpingjacks"))}
+            {getWorkoutById("situps") && renderBubble(getWorkoutById("situps"))}
+            {getWorkoutById("mountainclimbers") && renderBubble(getWorkoutById("mountainclimbers"))}
+          </View>
+
+          {/* Level 5 – Challenge */}
+          <View style={styles.doubleRow}>
+            {getWorkoutById("burpees") && renderBubble(getWorkoutById("burpees"))}
+            {getWorkoutById("pullups") && renderBubble(getWorkoutById("pullups"))}
+          </View>
         </ScrollView>
       </View>
     </PaperProvider>
@@ -213,6 +178,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-around",
     width: "100%",
+    marginVertical: 40,
+  },
+  multiRow: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    width: "100%",
+    flexWrap: "wrap",
     marginVertical: 40,
   },
   bubble: {
