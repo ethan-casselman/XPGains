@@ -1,13 +1,21 @@
-import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
-import { Text, Appbar, PaperProvider, ActivityIndicator } from 'react-native-paper';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { router } from 'expo-router';
-import Svg, { Line } from 'react-native-svg';
-import { getProgress, getWorkoutTree, completeWorkout } from './lib/api';
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+} from "react-native";
+import {
+  Text,
+  Appbar,
+  PaperProvider,
+  ActivityIndicator,
+} from "react-native-paper";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { router } from "expo-router";
+import { getProgress, getWorkoutTree, completeWorkout } from "./lib/api";
 
-const screenWidth = Dimensions.get('window').width;
-const bubbleSize = 120;
+const bubbleSize = 110;
 
 export default function ProgressiveTree() {
   const [loading, setLoading] = useState(true);
@@ -15,9 +23,9 @@ export default function ProgressiveTree() {
   const [workouts, setWorkouts] = useState([]);
 
   useEffect(() => {
-    async function fetchData() {
+    (async () => {
       try {
-        const email = await AsyncStorage.getItem('userEmail');
+        const email = await AsyncStorage.getItem("userEmail");
         if (!email) return;
         const [progressData, workoutData] = await Promise.all([
           getProgress(email),
@@ -26,37 +34,36 @@ export default function ProgressiveTree() {
         setProgress(progressData);
         setWorkouts(workoutData);
       } catch (err) {
-        console.error('Error loading tree:', err.message);
+        console.error("Error loading tree:", err.message);
       } finally {
         setLoading(false);
       }
-    }
-    fetchData();
+    })();
   }, []);
 
-  const isUnlocked = (workout) => {
-    const userLevel = progress?.level ?? 1;
-    if (userLevel < (workout.levelRequired ?? 1)) return false;
-    if (!workout.prerequisites || workout.prerequisites.length === 0) return true;
-    return workout.prerequisites.every((req) =>
-      progress?.completedWorkouts?.includes(req)
+  const isUnlocked = (w) => {
+    const lvl = progress?.level ?? 1;
+    if (lvl < (w.levelRequired ?? 1)) return false;
+    if (!w.prerequisites || !w.prerequisites.length) return true;
+    return w.prerequisites.every((r) =>
+      progress?.completedWorkouts?.includes(r)
     );
   };
 
-  const getBubbleColor = (workout) => {
-    if (progress?.completedWorkouts?.includes(workout.id)) return '#15ff00ff'; // completed
-    if (isUnlocked(workout)) return '#ffff00ff'; // unlocked
-    return '#555'; // locked
+  const getColor = (w) => {
+    if (progress?.completedWorkouts?.includes(w.id)) return "#15ff00ff"; // completed
+    if (isUnlocked(w)) return "#ffff00ff"; // unlocked
+    return "#555"; // locked
   };
 
-  const handleWorkoutPress = async (workout) => {
+  const handleWorkoutPress = async (w) => {
     try {
-      const email = await AsyncStorage.getItem('userEmail');
-      const updated = await completeWorkout(email, workout.id);
+      const email = await AsyncStorage.getItem("userEmail");
+      const updated = await completeWorkout(email, w.id);
       setProgress(updated);
-      alert(`${workout.name} completed!`);
+      alert(`${w.name} completed!`);
     } catch (err) {
-      alert('Error completing workout: ' + err.message);
+      alert("Error completing workout: " + err.message);
     }
   };
 
@@ -71,80 +78,103 @@ export default function ProgressiveTree() {
     );
   }
 
-  // Group workouts by levelRequired
-  const levels = {};
-  workouts.forEach((w) => {
-    if (!levels[w.levelRequired]) levels[w.levelRequired] = [];
-    levels[w.levelRequired].push(w);
-  });
+  const getWorkout = (name) =>
+    workouts.find((w) => w.name.toLowerCase().includes(name.toLowerCase()));
 
-  const levelKeys = Object.keys(levels).sort((a, b) => a - b);
+  const warmUp = getWorkout("warm");
+  const pushUps = getWorkout("push");
+  const squats = getWorkout("squat");
+  const planks = getWorkout("plank");
+  const burpees = getWorkout("burpee");
 
   return (
     <PaperProvider>
       <View style={styles.container}>
         <Appbar.Header style={styles.header}>
           <Appbar.BackAction onPress={() => router.back()} />
-          <Appbar.Content title="Progressive Workout Tree" titleStyle={styles.title} />
+          <Appbar.Content
+            title="Progressive Workout Tree"
+            titleStyle={styles.title}
+          />
+          <View style={styles.levelBadge}>
+            <Text style={styles.levelText}>Lvl {progress?.level ?? 1}</Text>
+          </View>
         </Appbar.Header>
 
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.outerScroll}
-        >
-          <ScrollView
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={styles.innerScroll}
-          >
-            <Text style={styles.levelText}>Level: {progress?.level ?? 1}</Text>
+        <ScrollView contentContainerStyle={styles.treeContainer}>
+          {/* Level 1 - Warm Up */}
+          {warmUp && (
+            <TouchableOpacity
+              style={[styles.bubble, { backgroundColor: getColor(warmUp) }]}
+              disabled={
+                !isUnlocked(warmUp) ||
+                progress?.completedWorkouts?.includes(warmUp.id)
+              }
+              onPress={() => handleWorkoutPress(warmUp)}
+            >
+              <Text style={styles.bubbleText}>{warmUp.name}</Text>
+            </TouchableOpacity>
+          )}
 
-            {levelKeys.map((level) => (
-              <View key={level} style={styles.levelRow}>
-                {levels[level].map((workout, idx) => (
-                  <View key={workout.id} style={styles.nodeContainer}>
-                    {/* Connector lines */}
-                    {workout.prerequisites?.map((reqId) => {
-                      const parent = workouts.find((w) => w.id === reqId);
-                      if (!parent) return null;
-                      return (
-                        <Svg
-                          key={`${workout.id}-${reqId}`}
-                          height="80"
-                          width={screenWidth}
-                          style={styles.lineSvg}
-                        >
-                          <Line
-                            x1={bubbleSize / 2}
-                            y1={0}
-                            x2={bubbleSize / 2 + (idx * 80 - 40)}
-                            y2={80}
-                            stroke="#15ff00ff"
-                            strokeWidth="3"
-                          />
-                        </Svg>
-                      );
-                    })}
+          {/* Level 2 - Push-Ups */}
+          {pushUps && (
+            <View style={styles.singleRow}>
+              <TouchableOpacity
+                style={[styles.bubble, { backgroundColor: getColor(pushUps) }]}
+                disabled={
+                  !isUnlocked(pushUps) ||
+                  progress?.completedWorkouts?.includes(pushUps.id)
+                }
+                onPress={() => handleWorkoutPress(pushUps)}
+              >
+                <Text style={styles.bubbleText}>{pushUps.name}</Text>
+              </TouchableOpacity>
+            </View>
+          )}
 
-                    {/* Bubble */}
-                    <TouchableOpacity
-                      style={[
-                        styles.bubble,
-                        { backgroundColor: getBubbleColor(workout) },
-                      ]}
-                      disabled={
-                        !isUnlocked(workout) ||
-                        progress?.completedWorkouts?.includes(workout.id)
-                      }
-                      onPress={() => handleWorkoutPress(workout)}
-                    >
-                      <Text style={styles.bubbleText}>{workout.name}</Text>
-                    </TouchableOpacity>
-                  </View>
-                ))}
-              </View>
-            ))}
-          </ScrollView>
+          {/* Level 3 - Squats and Planks */}
+          <View style={styles.doubleRow}>
+            {squats && (
+              <TouchableOpacity
+                style={[styles.bubble, { backgroundColor: getColor(squats) }]}
+                disabled={
+                  !isUnlocked(squats) ||
+                  progress?.completedWorkouts?.includes(squats.id)
+                }
+                onPress={() => handleWorkoutPress(squats)}
+              >
+                <Text style={styles.bubbleText}>{squats.name}</Text>
+              </TouchableOpacity>
+            )}
+            {planks && (
+              <TouchableOpacity
+                style={[styles.bubble, { backgroundColor: getColor(planks) }]}
+                disabled={
+                  !isUnlocked(planks) ||
+                  progress?.completedWorkouts?.includes(planks.id)
+                }
+                onPress={() => handleWorkoutPress(planks)}
+              >
+                <Text style={styles.bubbleText}>{planks.name}</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+
+          {/* Level 4 - Burpees */}
+          {burpees && (
+            <View style={styles.singleRow}>
+              <TouchableOpacity
+                style={[styles.bubble, { backgroundColor: getColor(burpees) }]}
+                disabled={
+                  !isUnlocked(burpees) ||
+                  progress?.completedWorkouts?.includes(burpees.id)
+                }
+                onPress={() => handleWorkoutPress(burpees)}
+              >
+                <Text style={styles.bubbleText}>{burpees.name}</Text>
+              </TouchableOpacity>
+            </View>
+          )}
         </ScrollView>
       </View>
     </PaperProvider>
@@ -152,43 +182,50 @@ export default function ProgressiveTree() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#000' },
-  header: { backgroundColor: '#343434ff' },
-  title: { color: '#15ff00ff', fontWeight: 'bold', fontSize: 22 },
+  container: { flex: 1, backgroundColor: "#000" },
+  header: { backgroundColor: "#343434ff" },
+  title: { color: "#15ff00ff", fontWeight: "bold", fontSize: 22 },
+  levelBadge: {
+    backgroundColor: "#15ff00ff",
+    borderRadius: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    marginRight: 10,
+  },
   levelText: {
-    color: '#15ff00ff',
-    fontSize: 20,
-    fontWeight: '700',
-    marginBottom: 20,
+    color: "#000",
+    fontWeight: "bold",
+    fontSize: 16,
   },
-  outerScroll: {
-    padding: 20,
+  center: { flex: 1, justifyContent: "center", alignItems: "center" },
+  treeContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 40,
+    paddingHorizontal: 20,
   },
-  innerScroll: {
-    alignItems: 'center',
-    paddingBottom: 120,
+  singleRow: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginVertical: 40,
   },
-  levelRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginBottom: 60,
-  },
-  nodeContainer: {
-    alignItems: 'center',
-    marginHorizontal: 20,
+  doubleRow: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    width: "100%",
+    marginVertical: 40,
   },
   bubble: {
     width: bubbleSize,
     height: bubbleSize,
     borderRadius: bubbleSize / 2,
-    alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: "center",
+    alignItems: "center",
+    marginHorizontal: 10,
   },
-  bubbleText: { color: '#000', fontWeight: '700', textAlign: 'center' },
-  lineSvg: {
-    position: 'absolute',
-    top: -60,
-    left: 0,
+  bubbleText: {
+    color: "#000",
+    fontWeight: "700",
+    textAlign: "center",
   },
-  center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
 });
