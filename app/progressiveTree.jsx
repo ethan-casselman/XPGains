@@ -134,8 +134,6 @@ export default function ProgressiveTree() {
           <View style={styles.multiRow}>
             {getWorkoutById('jumpingjacks') && renderBubble(getWorkoutById('jumpingjacks'))}
             {getWorkoutById('situps') && renderBubble(getWorkoutById('situps'))}
-          </View>
-          <View style={styles.multiRow}>
             {getWorkoutById('mountainclimbers') && renderBubble(getWorkoutById('mountainclimbers'))}
             {getWorkoutById('lunges') && renderBubble(getWorkoutById('lunges'))}
           </View>
@@ -218,18 +216,43 @@ const styles = StyleSheet.create({
   header: { backgroundColor: '#343434ff', alignItems: 'center' },
   title: { color: '#15ff00ff', fontWeight: 'bold', fontSize: 20 },
   levelText: { color: '#15ff00ff', marginRight: 15, fontWeight: '600' },
-  treeContainer: { alignItems: 'center', paddingVertical: 30, paddingBottom: 80 },
-  multiRow: { flexDirection: 'row', justifyContent: 'center', marginVertical: 10 },
-  singleRow: { flexDirection: 'row', justifyContent: 'center', marginVertical: 15 },
-  bubble: {
-    paddingVertical: 20,
-    paddingHorizontal: 28,
-    borderRadius: 50,
-    marginHorizontal: 10,
-    width: 220,
+
+  treeContainer: {
     alignItems: 'center',
+    paddingVertical: 30,
+    paddingBottom: 80,
   },
-  bubbleText: { color: '#000', fontWeight: '700', fontSize: 16 },
+
+  multiRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginVertical: 10,
+    flexWrap: 'wrap', // ✅ allow wrapping on small screens
+  },
+  singleRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginVertical: 15,
+  },
+
+  bubble: {
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    borderRadius: 50,
+    marginHorizontal: 6,
+    marginVertical: 6,
+    minWidth: 120,
+    maxWidth: 160, // ✅ responsive sizing
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  bubbleText: {
+    color: '#000',
+    fontWeight: '700',
+    fontSize: 14,
+    textAlign: 'center',
+  },
+
   modalContainer: {
     backgroundColor: '#111',
     margin: 20,
@@ -241,6 +264,7 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: 'bold',
     marginBottom: 10,
+    textAlign: 'center',
   },
   workoutGif: {
     width: 250,
@@ -272,3 +296,4 @@ const styles = StyleSheet.create({
   },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
 });
+
