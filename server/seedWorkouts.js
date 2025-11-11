@@ -39,7 +39,7 @@ const workouts = [
     levelRequired: 2,
     order: 1,
     prerequisites: ['dynamicstretch', 'armcircles', 'highknees'],
-    gifUrl: 'https://media.giphy.com/media/l3vR3z8j3UO1hZJEA/giphy.gif',
+    gifUrl: 'https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExc2Y1OGFwYmRxMDFjbWltbGxqMzJrNzFncjQxM2NuOWxueThpamIwNiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/jWlXhoEw9ou8CmrDY7/giphy.gif',
     description:
       'Keep your body in a straight line. Lower yourself until your chest nearly touches the floor, then push back up.',
   },

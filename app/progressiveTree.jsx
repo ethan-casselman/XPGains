@@ -114,9 +114,9 @@ export default function ProgressiveTree() {
         <ScrollView contentContainerStyle={styles.treeContainer}>
           {/* Level 1 */}
           <View style={styles.multiRow}>
-            {getWorkoutById('warmup1') && renderBubble(getWorkoutById('warmup1'))}
-            {getWorkoutById('warmup2') && renderBubble(getWorkoutById('warmup2'))}
-            {getWorkoutById('warmup3') && renderBubble(getWorkoutById('warmup3'))}
+            {getWorkoutById('dynamicstretch') && renderBubble(getWorkoutById('dynamicstretch'))}
+            {getWorkoutById('armcircles') && renderBubble(getWorkoutById('armcircles'))}
+            {getWorkoutById('highknees') && renderBubble(getWorkoutById('highknees'))}
           </View>
 
           {/* Level 2 */}
