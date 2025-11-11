@@ -9,8 +9,10 @@ export default function ProgressiveTree() {
   const [loading, setLoading] = useState(true);
   const [progress, setProgress] = useState(null);
   const [workouts, setWorkouts] = useState([]);
+
+  // Modal state
   const [selectedWorkout, setSelectedWorkout] = useState(null);
-  const [timer, setTimer] = useState(30); // default 30-second timer
+  const [timer, setTimer] = useState(30);
   const [isTiming, setIsTiming] = useState(false);
 
   useEffect(() => {
@@ -35,9 +37,8 @@ export default function ProgressiveTree() {
     fetchData();
   }, []);
 
-  // Unlock logic
   const isUnlocked = (workout) => {
-    if (!workout.prerequisites?.length) return true;
+    if (!workout.prerequisites || workout.prerequisites.length === 0) return true;
     return workout.prerequisites.every((req) =>
       progress?.completedWorkouts?.includes(req)
     );
@@ -46,7 +47,7 @@ export default function ProgressiveTree() {
   const getBubbleColor = (workout) => {
     if (progress?.completedWorkouts?.includes(workout.id)) return '#15ff00ff'; // green
     if (isUnlocked(workout)) return '#ffff00ff'; // yellow
-    return '#555'; // gray
+    return '#555'; // locked
   };
 
   const handleWorkoutPress = (workout) => {
@@ -66,7 +67,7 @@ export default function ProgressiveTree() {
     }
   };
 
-  // Timer effect
+  // Countdown timer logic
   useEffect(() => {
     let interval;
     if (isTiming && timer > 0) {
@@ -87,33 +88,62 @@ export default function ProgressiveTree() {
     );
   }
 
+  const renderBubble = (workout) => (
+    <TouchableOpacity
+      key={workout.id}
+      style={[styles.bubble, { backgroundColor: getBubbleColor(workout) }]}
+      disabled={!isUnlocked(workout)}
+      onPress={() => handleWorkoutPress(workout)}
+    >
+      <Text style={styles.bubbleText}>{workout.name}</Text>
+    </TouchableOpacity>
+  );
+
+  const getWorkoutById = (id) => workouts.find((w) => w.id === id);
+
   return (
     <PaperProvider>
       <View style={styles.container}>
         <Appbar.Header style={styles.header}>
           <Appbar.BackAction onPress={() => router.back()} />
-          <Appbar.Content
-            title="Progressive Workout Tree"
-            titleStyle={styles.title}
-          />
+          <Appbar.Content title="Progressive Workout Tree" titleStyle={styles.title} />
           <Text style={styles.levelText}>Lvl {progress?.level ?? 1}</Text>
         </Appbar.Header>
 
-        <ScrollView contentContainerStyle={styles.treeContainer} horizontal>
-          <View style={{ alignItems: 'center', padding: 20 }}>
-            {workouts.map((workout) => (
-              <TouchableOpacity
-                key={workout.id}
-                style={[
-                  styles.bubble,
-                  { backgroundColor: getBubbleColor(workout) },
-                ]}
-                disabled={!isUnlocked(workout)}
-                onPress={() => handleWorkoutPress(workout)}
-              >
-                <Text style={styles.bubbleText}>{workout.name}</Text>
-              </TouchableOpacity>
-            ))}
+        {/* Scrollable tree layout (unchanged) */}
+        <ScrollView contentContainerStyle={styles.treeContainer}>
+          {/* Level 1 */}
+          <View style={styles.multiRow}>
+            {getWorkoutById('warmup1') && renderBubble(getWorkoutById('warmup1'))}
+            {getWorkoutById('warmup2') && renderBubble(getWorkoutById('warmup2'))}
+            {getWorkoutById('warmup3') && renderBubble(getWorkoutById('warmup3'))}
+          </View>
+
+          {/* Level 2 */}
+          <View style={styles.singleRow}>
+            {getWorkoutById('pushups') && renderBubble(getWorkoutById('pushups'))}
+          </View>
+
+          {/* Level 3 */}
+          <View style={styles.multiRow}>
+            {getWorkoutById('squats') && renderBubble(getWorkoutById('squats'))}
+            {getWorkoutById('plank') && renderBubble(getWorkoutById('plank'))}
+          </View>
+
+          {/* Level 4 – reordered layout */}
+          <View style={styles.multiRow}>
+            {getWorkoutById('jumpingjacks') && renderBubble(getWorkoutById('jumpingjacks'))}
+            {getWorkoutById('situps') && renderBubble(getWorkoutById('situps'))}
+          </View>
+          <View style={styles.multiRow}>
+            {getWorkoutById('mountainclimbers') && renderBubble(getWorkoutById('mountainclimbers'))}
+            {getWorkoutById('lunges') && renderBubble(getWorkoutById('lunges'))}
+          </View>
+
+          {/* Level 5 */}
+          <View style={styles.multiRow}>
+            {getWorkoutById('burpees') && renderBubble(getWorkoutById('burpees'))}
+            {getWorkoutById('pullups') && renderBubble(getWorkoutById('pullups'))}
           </View>
         </ScrollView>
 
@@ -127,14 +157,17 @@ export default function ProgressiveTree() {
             {selectedWorkout && (
               <View style={{ alignItems: 'center' }}>
                 <Text style={styles.modalTitle}>{selectedWorkout.name}</Text>
-                {/* Replace with actual hosted gif URLs in DB */}
                 <Image
-                  source={{ uri: selectedWorkout.gifUrl || 'https://media.giphy.com/media/3o7aD2saalBwwftBIY/giphy.gif' }}
+                  source={{
+                    uri:
+                      selectedWorkout.gifUrl ||
+                      'https://media.giphy.com/media/3o7aD2saalBwwftBIY/giphy.gif',
+                  }}
                   style={styles.workoutGif}
                 />
                 <Text style={styles.modalText}>
                   {selectedWorkout.description ||
-                    'Follow proper form and control your movement. Keep breathing!'}
+                    'Follow proper form and breathing. Focus on smooth, controlled motion.'}
                 </Text>
 
                 <Text style={styles.timerText}>
@@ -185,12 +218,14 @@ const styles = StyleSheet.create({
   header: { backgroundColor: '#343434ff', alignItems: 'center' },
   title: { color: '#15ff00ff', fontWeight: 'bold', fontSize: 20 },
   levelText: { color: '#15ff00ff', marginRight: 15, fontWeight: '600' },
-  treeContainer: { paddingBottom: 80, alignItems: 'center' },
+  treeContainer: { alignItems: 'center', paddingVertical: 30, paddingBottom: 80 },
+  multiRow: { flexDirection: 'row', justifyContent: 'center', marginVertical: 10 },
+  singleRow: { flexDirection: 'row', justifyContent: 'center', marginVertical: 15 },
   bubble: {
     paddingVertical: 20,
     paddingHorizontal: 28,
     borderRadius: 50,
-    marginVertical: 12,
+    marginHorizontal: 10,
     width: 220,
     alignItems: 'center',
   },

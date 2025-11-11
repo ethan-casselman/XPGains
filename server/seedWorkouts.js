@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import 'dotenv/config';
-import { Workout } from './models/Workout.js';
+import { Workout } from './src/models/Workout.js';
 
 const workouts = [
   // ----- LEVEL 1: Warm-Ups -----
