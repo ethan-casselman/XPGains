@@ -2,12 +2,13 @@ import mongoose from 'mongoose';
 
 const workoutSchema = new mongoose.Schema(
   {
-    id: { type: String, required: true, unique: true },
-    name: { type: String, required: true },
-    description: { type: String, default: '' },
-    levelRequired: { type: Number, default: 1 },
-    prerequisites: { type: [String], default: [] },
-    order: {type: Number, default: 0},
+  id: { type: String, required: true, unique: true },   // e.g., 'pushups'
+  name: { type: String, required: true },               // Human-readable
+  levelRequired: { type: Number, required: true },      // 1–5
+  order: { type: Number, required: true },              // Controls display order
+  prerequisites: { type: [String], default: [] },       // IDs required before unlocking
+  gifUrl: { type: String, default: '' },                // NEW → animation link
+  description: { type: String, default: '' },           // NEW → instructions/tips
   },
   { timestamps: true }
 );

@@ -116,6 +116,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     fontSize: 22,
     marginBottom: 16,
+    color: '#000000ff',
   },
   input: {
     marginVertical: 6,
