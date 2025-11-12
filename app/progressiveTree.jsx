@@ -5,12 +5,25 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
 import { getProgress, getWorkoutTree, completeWorkout } from './lib/api';
 
+// 🏋️ Local workout media mapping (connects IDs to your local files)
+const workoutMedia = {
+  'armcircles': require('../assets/img/arm-circles.gif'),
+  'burpees': require('../assets/img/burpees.gif'),
+  'highknees': require('../assets/img/high-knees.gif'),
+  'jumpingjacks': require('../assets/img/jumping-jacks.gif'),
+  'lunges': require('../assets/img/lunges.gif'),
+  'mountainclimbers': require('../assets/img/mountain-climbers.gif'),
+  'plank': require('../assets/img/plank.gif'),
+  'pullups': require('../assets/img/pull-ups.gif'),
+  'pushups': require('../assets/img/push-up.gif'),
+  'situps': require('../assets/img/sit-ups.gif'),
+  'squats': require('../assets/img/squats.gif'),
+};
+
 export default function ProgressiveTree() {
   const [loading, setLoading] = useState(true);
   const [progress, setProgress] = useState(null);
   const [workouts, setWorkouts] = useState([]);
-
-  // Modal state
   const [selectedWorkout, setSelectedWorkout] = useState(null);
   const [timer, setTimer] = useState(30);
   const [isTiming, setIsTiming] = useState(false);
@@ -110,7 +123,7 @@ export default function ProgressiveTree() {
           <Text style={styles.levelText}>Lvl {progress?.level ?? 1}</Text>
         </Appbar.Header>
 
-        {/* Scrollable tree layout (unchanged) */}
+        {/* Scrollable tree layout */}
         <ScrollView contentContainerStyle={styles.treeContainer}>
           {/* Level 1 */}
           <View style={styles.multiRow}>
@@ -130,7 +143,7 @@ export default function ProgressiveTree() {
             {getWorkoutById('plank') && renderBubble(getWorkoutById('plank'))}
           </View>
 
-          {/* Level 4 – reordered layout */}
+          {/* Level 4 */}
           <View style={styles.multiRow}>
             {getWorkoutById('jumpingjacks') && renderBubble(getWorkoutById('jumpingjacks'))}
             {getWorkoutById('situps') && renderBubble(getWorkoutById('situps'))}
@@ -155,14 +168,15 @@ export default function ProgressiveTree() {
             {selectedWorkout && (
               <View style={{ alignItems: 'center' }}>
                 <Text style={styles.modalTitle}>{selectedWorkout.name}</Text>
-                <Image
-                  source={{
-                    uri:
-                      selectedWorkout.gifUrl ||
-                      'https://media.giphy.com/media/3o7aD2saalBwwftBIY/giphy.gif',
-                  }}
-                  style={styles.workoutGif}
-                />
+
+                {/* Display local media */}
+                {workoutMedia[selectedWorkout.id] && (
+                  <Image
+                    source={workoutMedia[selectedWorkout.id]}
+                    style={styles.workoutGif}
+                  />
+                )}
+
                 <Text style={styles.modalText}>
                   {selectedWorkout.description ||
                     'Follow proper form and breathing. Focus on smooth, controlled motion.'}
@@ -186,10 +200,7 @@ export default function ProgressiveTree() {
                   mode="contained"
                   onPress={handleCompleteWorkout}
                   disabled={timer > 0}
-                  style={[
-                    styles.completeButton,
-                    { opacity: timer > 0 ? 0.5 : 1 },
-                  ]}
+                  style={[styles.completeButton, { opacity: timer > 0 ? 0.5 : 1 }]}
                 >
                   Mark as Complete
                 </Button>
@@ -216,84 +227,30 @@ const styles = StyleSheet.create({
   header: { backgroundColor: '#343434ff', alignItems: 'center' },
   title: { color: '#15ff00ff', fontWeight: 'bold', fontSize: 20 },
   levelText: { color: '#15ff00ff', marginRight: 15, fontWeight: '600' },
-
-  treeContainer: {
-    alignItems: 'center',
-    paddingVertical: 30,
-    paddingBottom: 80,
-  },
-
-  multiRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginVertical: 10,
-    flexWrap: 'wrap', // ✅ allow wrapping on small screens
-  },
-  singleRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginVertical: 15,
-  },
-
+  treeContainer: { alignItems: 'center', paddingVertical: 30, paddingBottom: 80 },
+  multiRow: { flexDirection: 'row', justifyContent: 'center', marginVertical: 10, flexWrap: 'wrap' },
+  singleRow: { flexDirection: 'row', justifyContent: 'center', marginVertical: 15 },
   bubble: {
-    paddingVertical: 16,
+    paddingVertical: 20,
     paddingHorizontal: 20,
     borderRadius: 50,
-    marginHorizontal: 6,
-    marginVertical: 6,
-    minWidth: 120,
-    maxWidth: 160, // ✅ responsive sizing
+    margin: 8,
+    width: 150,
     alignItems: 'center',
-    justifyContent: 'center',
   },
-  bubbleText: {
-    color: '#000',
-    fontWeight: '700',
-    fontSize: 14,
-    textAlign: 'center',
-  },
-
+  bubbleText: { color: '#000', fontWeight: '700', fontSize: 14, textAlign: 'center' },
   modalContainer: {
     backgroundColor: '#111',
     margin: 20,
     padding: 20,
     borderRadius: 15,
   },
-  modalTitle: {
-    color: '#15ff00ff',
-    fontSize: 22,
-    fontWeight: 'bold',
-    marginBottom: 10,
-    textAlign: 'center',
-  },
-  workoutGif: {
-    width: 250,
-    height: 180,
-    borderRadius: 10,
-    marginBottom: 15,
-  },
-  modalText: {
-    color: '#fff',
-    textAlign: 'center',
-    marginBottom: 20,
-    fontSize: 15,
-  },
-  timerText: {
-    color: '#15ff00ff',
-    fontSize: 18,
-    marginBottom: 10,
-  },
-  startButton: {
-    backgroundColor: '#15ff00ff',
-    marginBottom: 10,
-  },
-  completeButton: {
-    backgroundColor: '#008000',
-    marginBottom: 10,
-  },
-  exitButton: {
-    borderColor: '#aaa',
-  },
+  modalTitle: { color: '#15ff00ff', fontSize: 22, fontWeight: 'bold', marginBottom: 10 },
+  workoutGif: { width: 250, height: 180, borderRadius: 10, marginBottom: 15 },
+  modalText: { color: '#fff', textAlign: 'center', marginBottom: 20, fontSize: 15 },
+  timerText: { color: '#15ff00ff', fontSize: 18, marginBottom: 10 },
+  startButton: { backgroundColor: '#15ff00ff', marginBottom: 10 },
+  completeButton: { backgroundColor: '#008000', marginBottom: 10 },
+  exitButton: { borderColor: '#aaa' },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
 });
-
