@@ -5,7 +5,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
 import { getProgress, getWorkoutTree, completeWorkout } from './lib/api';
 
-// 🏋️ Local workout media mapping (connects IDs to your local files)
 const workoutMedia = {
   'armcircles': require('../assets/img/arm-circles.gif'),
   'burpees': require('../assets/img/burpees.gif'),
