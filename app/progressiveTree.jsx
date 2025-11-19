@@ -6,6 +6,7 @@ import { router } from 'expo-router';
 import { getProgress, getWorkoutTree, completeWorkout } from './lib/api';
 
 const workoutMedia = {
+  'torsotwists': require('../assets/img/torsotwists.gif'),
   'armcircles': require('../assets/img/arm-circles.gif'),
   'burpees': require('../assets/img/burpees.gif'),
   'highknees': require('../assets/img/high-knees.gif'),
@@ -126,7 +127,7 @@ export default function ProgressiveTree() {
         <ScrollView contentContainerStyle={styles.treeContainer}>
           {/* Level 1 */}
           <View style={styles.multiRow}>
-            {getWorkoutById('dynamicstretch') && renderBubble(getWorkoutById('dynamicstretch'))}
+            {getWorkoutById('torsotwists') && renderBubble(getWorkoutById('torsotwists'))}
             {getWorkoutById('armcircles') && renderBubble(getWorkoutById('armcircles'))}
             {getWorkoutById('highknees') && renderBubble(getWorkoutById('highknees'))}
           </View>

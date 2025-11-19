@@ -5,12 +5,12 @@ import { Workout } from './src/models/Workout.js';
 const workouts = [
   // ----- LEVEL 1: Warm-Ups -----
   {
-    id: 'dynamicstretch',
-    name: 'Dynamic Stretch',
+    id: 'torsotwists',
+    name: 'Torso Twists',
     levelRequired: 1,
     order: 1,
     description:
-      'Perform dynamic stretches such as leg swings and arm rotations for 30 seconds. Keep your movements controlled and smooth.',
+      'Stand with your feet shoulder-width apart and rotate your torso left and right at a steady pace, keeping your core engaged and arms up, repeating controlled twists continuously for 30 seconds.',
   },
   {
     id: 'armcircles',
