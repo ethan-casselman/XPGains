@@ -1,5 +1,13 @@
-import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, ScrollView, TouchableOpacity, FlatList } from 'react-native';
+import React, { useEffect, useState, useRef } from 'react';
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  FlatList,
+  TextInput,
+  Image
+} from 'react-native';
 import { Appbar, Text, Button, Card, Portal, Modal, List } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
@@ -14,12 +22,24 @@ import {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { format, addDays, startOfWeek, addWeeks, subWeeks } from 'date-fns';
 
-//
-// DATE HELPERS — CORRECT LOCAL, NO UTC DRIFT
-//
+const workoutMedia = {
+  'torsotwists': require('../assets/img/torsotwists.gif'),
+  'armcircles': require('../assets/img/arm-circles.gif'),
+  'burpees': require('../assets/img/burpees.gif'),
+  'highknees': require('../assets/img/high-knees.gif'),
+  'jumpingjacks': require('../assets/img/jumping-jacks.gif'),
+  'lunges': require('../assets/img/lunges.gif'),
+  'mountainclimbers': require('../assets/img/mountain-climbers.gif'),
+  'plank': require('../assets/img/plank.gif'),
+  'pullups': require('../assets/img/pull-ups.gif'),
+  'pushups': require('../assets/img/push-up.gif'),
+  'situps': require('../assets/img/sit-ups.gif'),
+  'squats': require('../assets/img/squats.gif'),
+};
+
 function parseISODateLocal(iso) {
   const [y, m, d] = iso.split("-").map(Number);
-  return new Date(y, m - 1, d); // LOCAL midnight
+  return new Date(y, m - 1, d);
 }
 
 function isoDateLocal(d) {
@@ -43,6 +63,11 @@ export default function CustomSchedule() {
   const [dayModalVisible, setDayModalVisible] = useState(false);
   const [selectedWorkoutForView, setSelectedWorkoutForView] = useState(null);
   const [userEmail, setUserEmail] = useState(null);
+
+  const [timerMinutes, setTimerMinutes] = useState("");
+  const [timerSeconds, setTimerSeconds] = useState("");
+  const [timeLeft, setTimeLeft] = useState(null);
+  const timerRef = useRef(null);
 
   async function loadWeek(email, weekStartISO) {
     try {
@@ -73,17 +98,40 @@ export default function CustomSchedule() {
     if (userEmail) loadWeek(userEmail, weekStart);
   }, [weekStart]);
 
-  //
-  // Build week based on local date
-  //
   function getWeekArray() {
     const start = parseISODateLocal(weekStart);
     return Array.from({ length: 7 }, (_, i) => addDays(start, i));
   }
 
-  //
-  // FIXED: READ MONGOOSE SUBDOCS PROPERLY
-  //
+  function startTimer() {
+    const min = parseInt(timerMinutes) || 0;
+    const sec = parseInt(timerSeconds) || 0;
+    const total = min * 60 + sec;
+
+    if (total <= 0) return;
+
+    setTimeLeft(total);
+
+    if (timerRef.current) clearInterval(timerRef.current);
+
+    timerRef.current = setInterval(() => {
+      setTimeLeft((t) => {
+        if (t <= 1) {
+          clearInterval(timerRef.current);
+          timerRef.current = null;
+          return 0;
+        }
+        return t - 1;
+      });
+    }, 1000);
+  }
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, []);
+
   function itemsForDate(dateISO) {
     return schedule.filter((s) => {
       const d = s.date ?? s._doc?.date;
@@ -168,30 +216,43 @@ export default function CustomSchedule() {
                   <Text style={styles.noWorkout}>No workouts</Text>
                 ) : (
                   <View style={{ marginTop: 8 }}>
-                    {items.map((it) => {
-                      const workoutId = it.workoutId ?? it._doc?.workoutId;
-                      const date = it.date ?? it._doc?.date;
+                    {items.map((it) => (
+                      <TouchableOpacity
+                        key={it.workoutId}
+                        style={styles.pill}
+                        onPress={() => {
+  // Correctly extract the workout ID
+  const wid =
+    it.workoutId ||
+    it.workoutID ||
+    it.workout?.id;
 
-                      return (
-                        <Card key={workoutId} style={styles.scheduledCard}>
-                          <Card.Content>
-                            <Text numberOfLines={1}>
-                              {it.workout?.name ?? workoutId}
-                            </Text>
-                          </Card.Content>
-                          <Card.Actions>
-                            <Button onPress={() => setSelectedWorkoutForView(it.workout)}>
-                              View
-                            </Button>
-                            <Button
-                              onPress={() => handleRemoveFromDate(date, workoutId)}
-                            >
-                              Remove
-                            </Button>
-                          </Card.Actions>
-                        </Card>
-                      );
-                    })}
+  if (!wid) {
+    console.error("Could not determine workout ID:", it);
+    return;
+  }
+
+  // Match full workout from workout tree
+  const fullWorkout = workouts.find(w => w.id === wid);
+
+  if (!fullWorkout) {
+    console.error("Workout not found in workouts list:", wid);
+    return;
+  }
+
+  // Set the full workout object (this fixes the missing description)
+  setSelectedWorkoutForView({
+    ...fullWorkout,
+    date: dateISO,
+  });
+}}
+
+                      >
+                        <Text numberOfLines={1} style={styles.pillText}>
+                          {it.workout?.name ?? it.workoutId}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
                   </View>
                 )}
               </TouchableOpacity>
@@ -254,17 +315,90 @@ export default function CustomSchedule() {
 
       {/* View workout modal */}
       <Portal>
-        <Modal visible={!!selectedWorkoutForView} onDismiss={() => setSelectedWorkoutForView(null)} contentContainerStyle={styles.modal}>
+        <Modal
+          visible={!!selectedWorkoutForView}
+          onDismiss={() => setSelectedWorkoutForView(null)}
+          contentContainerStyle={styles.modal}
+        >
           {selectedWorkoutForView && (
             <>
-              <Text style={{ fontWeight: "700", fontSize: 18 }}>
-                {selectedWorkoutForView.name}
-              </Text>
-              <Text style={{ marginTop: 8 }}>{selectedWorkoutForView.description}</Text>
+              {/* GIF */}
+                {workoutMedia[selectedWorkoutForView.id] ? (
+                  <Image
+                    source={workoutMedia[selectedWorkoutForView.id]}
+                    style={{ width: "100%", height: 180, borderRadius: 10, marginBottom: 12 }}
+                    resizeMode="contain"
+                  />
+                ) : selectedWorkoutForView.gifUrl ? (
+                  <Image
+                    source={{ uri: selectedWorkoutForView.gifUrl }}
+                    style={{ width: "100%", height: 180, borderRadius: 10, marginBottom: 12 }}
+                    resizeMode="contain"
+                  />
+                ) : (
+                  <Text style={{ color: "#888", marginBottom: 12 }}>
+                    No preview available
+                  </Text>
+                )}
 
-              <Button onPress={() => setSelectedWorkoutForView(null)} style={{ marginTop: 12 }}>
-                Close
+                {/* Description */}
+                  <View style={{ alignItems: "center" }}>
+                  <Text style={{ color: "#fff", marginBottom: 12, fontSize: 14 }}>
+                    {selectedWorkoutForView.description ||
+                      "Follow proper form and use controlled motion."}
+                  </Text>
+                  </View>
+
+              {/* Timer */}
+              <View style={{ marginBottom: 16, alignItems: "center" }}>
+                <Text style={{ color: "#15ff00ff", fontWeight: "700", marginBottom: 8 }}>
+                  Set Workout Timer
+                </Text>
+
+                <View style={{ flexDirection: "row", marginBottom: 8 }}>
+                  <TextInput
+                    keyboardType="numeric"
+                    placeholder="Min"
+                    placeholderTextColor="#666"
+                    value={timerMinutes}
+                    onChangeText={setTimerMinutes}
+                    style={styles.timerInput}
+                  />
+
+                  <TextInput
+                    keyboardType="numeric"
+                    placeholder="Sec"
+                    placeholderTextColor="#666"
+                    value={timerSeconds}
+                    onChangeText={setTimerSeconds}
+                    style={styles.timerInput}
+                  />
+                </View>
+
+                <Button mode="contained" onPress={startTimer} style={{ backgroundColor: "#15ff00ff" }}>
+                  Start Timer
+                </Button>
+
+                {timeLeft !== null && (
+                  <Text style={{ color: "#fff", fontSize: 22, marginTop: 10, alignSelf: "center" }}>
+                    {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, "0")}
+                  </Text>
+                )}
+              </View>
+
+              {/* Remove */}
+              <Button
+                mode="contained"
+                style={{ marginBottom: 10 }}
+                onPress={async () => {
+                  await handleRemoveFromDate(selectedWorkoutForView.date, selectedWorkoutForView.id);
+                  setSelectedWorkoutForView(null);
+                }}
+              >
+                Remove from Day
               </Button>
+
+              <Button onPress={() => setSelectedWorkoutForView(null)}>Close</Button>
             </>
           )}
         </Modal>
@@ -274,7 +408,7 @@ export default function CustomSchedule() {
 }
 
 //
-// Styles (unchanged)
+// Styles
 //
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#000" },
@@ -312,5 +446,29 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     borderRadius: 8,
     backgroundColor: "#222",
+  },
+  pill: {
+    backgroundColor: "#1f1f1f",
+    paddingHorizontal: 6,
+    paddingVertical: 3,
+    borderRadius: 6,
+    marginVertical: 2,
+    maxWidth: "100%",
+  },
+
+  pillText: {
+    color: "#15ff00ff",
+    fontSize: 10,
+    textAlign: "center",
+  },
+
+  timerInput: {
+    backgroundColor: "#222",
+    color: "#fff",
+    padding: 8,
+    borderRadius: 8,
+    width: 70,
+    marginRight: 8,
+    textAlign: "center",
   },
 });
