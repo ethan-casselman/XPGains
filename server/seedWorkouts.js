@@ -35,7 +35,7 @@ const workouts = [
     name: 'Push-Ups',
     levelRequired: 2,
     order: 1,
-    prerequisites: ['dynamicstretch', 'armcircles', 'highknees'],
+    prerequisites: ['torsotwists', 'armcircles', 'highknees'],
     description:
       'Keep your body in a straight line. Lower yourself until your chest nearly touches the floor, then push back up.',
   },
