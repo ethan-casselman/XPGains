@@ -1,5 +1,5 @@
 // lib/api.js
-const API_URL = 'http://192.168.0.10:4000/api';
+const API_URL = 'http://172.27.124.211:4000/api';
 // Base URL of our Express server. On a real device, replace localhost with your PC's LAN IP.
 
 async function request(path, { method = 'GET', body } = {}) {
