@@ -7,6 +7,9 @@ import {router} from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useEffect } from 'react';
 import { getProgress } from './lib/api';
+import { useFocusEffect } from 'expo-router';
+import { useCallback } from 'react';
+
 
 export default function Home() {
 
@@ -25,19 +28,24 @@ export default function Home() {
 
 const [userProgress, setUserProgress] = useState(null);
 
-useEffect(() => {
-  async function fetchProgress() {
-    const email = await AsyncStorage.getItem('userEmail');
-    if (!email) return;
-    try {
-      const progress = await getProgress(email);
-      setUserProgress(progress);
-    } catch (err) {
-      console.error('Failed to fetch progress:', err.message);
+useFocusEffect(
+  useCallback(() => {
+    async function fetchProgress() {
+      const email = await AsyncStorage.getItem('userEmail');
+      if (!email) return;
+
+      try {
+        const progress = await getProgress(email);
+        setUserProgress(progress);
+      } catch (err) {
+        console.error('Failed to fetch progress:', err.message);
+      }
     }
-  }
-  fetchProgress();
-}, []);
+
+    fetchProgress();
+  }, [])
+);
+
 
   return (
     <PaperProvider>
