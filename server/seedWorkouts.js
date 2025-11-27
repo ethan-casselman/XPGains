@@ -10,7 +10,7 @@ const workouts = [
     levelRequired: 1,
     order: 1,
     description:
-      'Stand with your feet shoulder-width apart and rotate your torso left and right at a steady pace, keeping your core engaged and arms up, repeating controlled twists continuously for 30 seconds.',
+      'Stand with your feet shoulder-width apart and rotate your torso left and right at a steady pace, keeping your core engaged and arms up, repeating controlled twists.',
   },
   {
     id: 'armcircles',
