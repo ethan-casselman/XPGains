@@ -86,6 +86,17 @@ const index = () => {
           <Card style={styles.featureCard}>
             <Card.Content style={styles.centeredCardContent}>
               <Text style={styles.featureCardTitle}>
+              Customize Your Workout Buddy!
+              </Text>
+            <Text style={styles.featureCardSubtitle}>
+            Level up and unlock new cosmetics for your workout buddy!
+              </Text>
+            </Card.Content>
+          </Card>
+
+          <Card style={styles.featureCard}>
+            <Card.Content style={styles.centeredCardContent}>
+              <Text style={styles.featureCardTitle}>
               Level Up Your Gains!
               </Text>
               <Image
