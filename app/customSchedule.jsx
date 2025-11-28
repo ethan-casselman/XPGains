@@ -7,10 +7,8 @@ import {
   FlatList,
   TextInput,
   Image,
-  KeyboardAvoidingView,
-  Platform,
   TouchableWithoutFeedback,
-  Keyboard
+  Keyboard,
 } from 'react-native';
 import { Appbar, Text, Button, List, Portal, Modal } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -209,85 +207,115 @@ export default function CustomSchedule() {
           </Button>
         </View>
 
-        {/* HORIZONTAL SCROLLING WEEK */}
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={{ paddingVertical: 10 }}
-        >
-          <View style={styles.weekRowHorizontal}>
-            {week.map((d) => {
-              const dateISO = isoDateLocal(d);
-              const items = itemsForDate(dateISO);
-
-              return (
-                <TouchableOpacity
-                  key={dateISO}
-                  style={styles.dayCard}
-                  onPress={() => {
-                    setSelectedDate(dateISO);
-                    setDayModalVisible(true);
-                  }}
-                >
-                  <Text style={styles.dayLabel}>{format(d, 'EEE')}</Text>
-                  <Text style={styles.dayNum}>{format(d, 'd')}</Text>
-
-                  {items.length === 0 ? (
-                    <Text style={styles.noWorkout}>No workouts</Text>
-                  ) : (
-                    <View
-                      style={{
-                        marginTop: 8,
-                        flexWrap: 'wrap',
-                        flexDirection: 'row',
-                        justifyContent: 'center',
-                      }}
-                    >
-                      {items.map((it) => (
-                        <TouchableOpacity
-                          key={it.workoutId}
-                          style={styles.pill}
-                          onPress={() => {
-                            const wid =
-                              it.workoutId ||
-                              it.workoutID ||
-                              it.workout?.id;
-
-                            const fullWorkout = workouts.find((w) => w.id === wid);
-                            if (!fullWorkout) return;
-
-                            setSelectedWorkoutForView({
-                              ...fullWorkout,
-                              date: dateISO,
-                            });
-                          }}
-                        >
-                          <Text style={styles.pillText}>
-                            {it.workout?.name ?? it.workoutId}
-                          </Text>
-                        </TouchableOpacity>
-                      ))}
-                    </View>
-                  )}
-                </TouchableOpacity>
-              );
-            })}
-          </View>
-        </ScrollView>
-
-        {/* TIPS */}
+        {/* ======= MAIN SCROLL VIEW (contains week & tips) ======= */}
         <ScrollView contentContainerStyle={styles.weekContainer}>
+
+          {/* HORIZONTAL SCROLLING WEEK */}
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={{ paddingVertical: 10 }}
+          >
+            <View style={styles.weekRowHorizontal}>
+              {week.map((d) => {
+                const dateISO = isoDateLocal(d);
+                const items = itemsForDate(dateISO);
+
+                return (
+                  <TouchableOpacity
+                    key={dateISO}
+                    style={styles.dayCard}
+                    onPress={() => {
+                      setSelectedDate(dateISO);
+                      setDayModalVisible(true);
+                    }}
+                  >
+                    <Text style={styles.dayLabel}>{format(d, 'EEE')}</Text>
+                    <Text style={styles.dayNum}>{format(d, 'd')}</Text>
+
+                    {items.length === 0 ? (
+                      <Text style={styles.noWorkout}>No workouts</Text>
+                    ) : (
+                      <View
+                        style={{
+                          marginTop: 8,
+                          flexWrap: 'wrap',
+                          flexDirection: 'row',
+                          justifyContent: 'center',
+                        }}
+                      >
+                        {items.map((it) => (
+                          <TouchableOpacity
+                            key={it.workoutId}
+                            style={styles.pill}
+                            onPress={() => {
+                              const wid =
+                                it.workoutId ||
+                                it.workoutID ||
+                                it.workout?.id;
+
+                              const fullWorkout = workouts.find((w) => w.id === wid);
+                              if (!fullWorkout) return;
+
+                              setSelectedWorkoutForView({
+                                ...fullWorkout,
+                                date: dateISO,
+                              });
+                            }}
+                          >
+                            <Text style={styles.pillText}>
+                              {it.workout?.name ?? it.workoutId}
+                            </Text>
+                          </TouchableOpacity>
+                        ))}
+                      </View>
+                    )}
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          </ScrollView>
+
+          {/* ======== TIPS SECTION (now inside scroll) ========= */}
           <View style={styles.tipsContainer}>
-            <Text style={styles.tipsTitle}>Tips for an Effective Workout Week</Text>
-            <List.Section>
-              <List.Item title="1. Alternate hard & easy days" description="Follow intense days with lighter sessions." />
-              <List.Item title="2. Prioritize compound lifts" description="Start the week with hardest exercises." />
-              <List.Item title="3. Plan recovery" description="At least one rest day per week." />
-              <List.Item title="4. Don't overtrain" description="Adjust if fatigued." />
-              <List.Item title="5. Review your progress" description="Let data guide next week’s plan." />
-            </List.Section>
-          </View>
+  <Text style={styles.tipsTitle}>Tips for an Effective Workout Week</Text>
+  <List.Section>
+    <List.Item
+      title="1. Alternate hard & easy days"
+      description="Follow intense days with lighter sessions."
+      titleStyle={{ color: '#1aff00ff' }}
+      descriptionStyle={{ color: '#fff' }}
+    />
+    <List.Item
+      title="2. Prioritize compound lifts"
+      description="Start the week with hardest exercises."
+      titleStyle={{ color: '#1aff00ff' }}
+      descriptionStyle={{ color: '#fff' }}
+    />
+    <List.Item
+      title="3. Plan recovery"
+      description="At least one rest day per week."
+      titleStyle={{ color: '#1aff00ff' }}
+      descriptionStyle={{ color: '#fff' }}
+    />
+    <List.Item
+      title="4. Don't overtrain"
+      description="Adjust if fatigued."
+      titleStyle={{ color: '#1aff00ff' }}
+      descriptionStyle={{ color: '#fff' }}
+    />
+    <List.Item
+      title="5. Review your progress"
+      description="Let data guide next week’s plan."
+      titleStyle={{ color: '#1aff00ff' }}
+      descriptionStyle={{ color: '#fff' }}
+    />
+  </List.Section>
+</View>
+
+
         </ScrollView>
+        {/* ======= END MAIN SCROLL VIEW ======= */}
 
         {/* ADD WORKOUT MODAL */}
         <Portal>
@@ -408,13 +436,13 @@ export default function CustomSchedule() {
                   </View>
 
                   <Button
-                      mode="text"
-                      onPress={Keyboard.dismiss}
-                      textColor="#15ff00ff"
-                      style={{ marginBottom: 8 }}
-                    >
-                      Done
-                    </Button>
+                    mode="text"
+                    onPress={Keyboard.dismiss}
+                    textColor="#15ff00ff"
+                    style={{ marginBottom: 8 }}
+                  >
+                    Done
+                  </Button>
 
                   <Button
                     mode="contained"
@@ -474,13 +502,11 @@ const styles = StyleSheet.create({
   },
   weekLabel: { color: '#fff', fontWeight: '600' },
 
-  // Horizontal Week Row
   weekRowHorizontal: {
     flexDirection: 'row',
     paddingHorizontal: 8,
   },
 
-  // DAY CARD
   dayCard: {
     backgroundColor: '#111',
     paddingVertical: 12,
@@ -495,7 +521,6 @@ const styles = StyleSheet.create({
   dayNum: { color: '#fff', fontWeight: '700', fontSize: 16 },
   noWorkout: { color: '#666', fontSize: 11, marginTop: 6 },
 
-  // PILL
   pill: {
     backgroundColor: '#1f1f1f',
     paddingHorizontal: 8,
@@ -543,5 +568,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 
-  weekContainer: { paddingHorizontal: 12, paddingBottom: 80 },
+  weekContainer: {
+    paddingHorizontal: 12,
+    paddingTop: 10,
+    paddingBottom: 120, // Extra room for pills
+  },
 });
