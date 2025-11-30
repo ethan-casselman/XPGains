@@ -82,7 +82,7 @@ export default function Home() {
                     </Dialog>
                 </Portal>
 
-                {/* ⭐ FIXED: ScrollView instead of static View */}
+                {/* FIXED: ScrollView instead of static View */}
                 <ScrollView contentContainerStyle={styles.bodyScroll}>
                     <Text style={{ color: '#15ff00ff', fontSize: 18, marginBottom: 12 }}>
                         Level: {userProgress?.level ?? 1}
@@ -128,7 +128,7 @@ export default function Home() {
                             </Text>
                             <Button
                                 mode="contained"
-                                onPress={() => router.push('')}
+                                onPress={() => router.push('/home')}
                                 style={styles.button}
                             >
                                 Open Shop

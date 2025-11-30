@@ -333,8 +333,10 @@ export default function CustomSchedule() {
 
                 return (
                   <List.Item
+                    titleStyle={styles.itemTitle}
                     title={item.name}
                     description={item.description}
+                    descriptionStyle={styles.itemDescription}
                     right={() =>
                       completed ? (
                         <Button mode="contained" onPress={() => handleAddToDate(selectedDate, item.id)}>
@@ -394,7 +396,7 @@ export default function CustomSchedule() {
                 )}
 
                 {/* DESCRIPTION */}
-                <Text style={{ color: '#fff', marginBottom: 12, fontSize: 14 }}>
+                <Text style={{ color: '#fff', marginBottom: 12, fontSize: 14, textAlign: 'center' }}>
                   {selectedWorkoutForView.description ||
                     'Follow proper form and controlled movements.'}
                 </Text>
@@ -441,7 +443,7 @@ export default function CustomSchedule() {
                     textColor="#15ff00ff"
                     style={{ marginBottom: 8 }}
                   >
-                    Done
+                    Close KeyBoard
                   </Button>
 
                   <Button
@@ -571,6 +573,15 @@ const styles = StyleSheet.create({
   weekContainer: {
     paddingHorizontal: 12,
     paddingTop: 10,
-    paddingBottom: 120, // Extra room for pills
+    paddingBottom: 120, 
   },
+
+  itemTitle: {
+  color: '#15ff00ff',
+  fontWeight: 'bold'
+  },
+  itemDescription: {
+  color: '#ccc'
+  },
+
 });
